@@ -12,14 +12,18 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "jsx": "react-jsx",
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"]
 }
