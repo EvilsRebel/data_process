@@ -1,49 +1,57 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
+import { Button, Table } from "antd";
+
+import { open } from "@tauri-apps/plugin-dialog";
 import "./App.css";
+import { ProductFixService } from "./service/productFixService";
+import { Product } from "./entities/product";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [items, setItems] = useState<Product[]>([]);
+  const handleTest = async () => {
+    const file = await open({
+      multiple: false,
+      directory: false,
+      filters: [{ extensions: ["xlsx"], name: "" }],
+    });
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+    if (!file) {
+      return;
+    }
+
+    setItems(await ProductFixService.processExcel(file));
+  };
+
+  const columns = [
+    { dataIndex: "name", title: "产品名称" },
+    { dataIndex: "priceAndUnit", title: "企业报价/报价单位" },
+    { dataIndex: "code", title: "医用耗材代码" },
+    { dataIndex: "model", title: "型号" },
+    { dataIndex: "status", title: "挂网状态" },
+    { dataIndex: "hasCancelDeclaration", title: "是否撤销申报" },
+    { dataIndex: "updateContent", title: "更新内容" },
+    { dataIndex: "updateTime", title: "更新时间" },
+    { dataIndex: "texture", title: "材质" },
+    { dataIndex: "registrationName", title: "注册证名称" },
+    { dataIndex: "registrationCode", title: "注册证编号" },
+    { dataIndex: "producer", title: "生产企业" },
+    { dataIndex: "declarant", title: "申报企业" },
+    { dataIndex: "specification", title: "规格" },
+    { dataIndex: "id", title: "采购平台产品ID" },
+  ];
 
   return (
     <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
+      <Button type="primary" onClick={handleTest}>
+        测试
+      </Button>
+      <br />
+      <Table
+        columns={columns}
+        dataSource={items}
+        pagination={{ defaultPageSize: 20 }}
+      />
     </main>
   );
 }
